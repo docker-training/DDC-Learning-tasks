@@ -13,17 +13,17 @@ In this exercise we will deploy an NGINX container
    **Container Name:** nginx_server
 5. Click on the **Network** link on the left navigation and configure the following port mappings:  
 
-  ![](images/ucp02_t2_networksettings.png)
+  ![](images/ucp02_t2_networksettings.PNG)
 
 6. Hit the **Run Container** button on the right side panel
 7. You should now see your container listed.   
 
-  ![](images/ucp02_t2_containers.png)
+  ![](images/ucp02_t2_containers.PNG)
 8. Click on the container details button on the right side and check the port mappings section  
 
   ![](images/ucp02_t2_containers_withhighlight.png)
 
-  ![](images/ucp02_t2_portmappings.png)
+  ![](images/ucp02_t2_portmappings.PNG)
 
 ## Quick Test
 
@@ -31,7 +31,7 @@ Access the NGINX server on your web browser. You will need to specify the hostna
 
 1. First, let's take a look at the node our `nginx_server` container is running on. In the container details, you can find the Node information.
 
-   ![](images/ucp02_t2_container_details_node.png)
+   ![](images/ucp02_t2_container_details_node.PNG)
 
    In this particular example, our NGINX container is running on the **ucptest-2** node. The host IP is 10.0.37.97. However in our AWS setup, this 
    is the private IP address of the node. You won't be able to use this address on your web browser. We will need the public IP or hostname. The AWS instance 
@@ -41,7 +41,4 @@ Access the NGINX server on your web browser. You will need to specify the hostna
 
    The result should be the NGINX welcome page.
    
-   ![](images/ucp02_t2_nginx_welcome.png)
-
-      
-   
+   ![](images/ucp02_t2_nginx_welcome.PNG)
