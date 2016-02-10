@@ -9,11 +9,11 @@ In this exercise we will deploy an NGINX container
 1. Click on **Containers** link on left navigation bar
 2. Click on **Deploy Container** button
 3. On the Basic settings section fill in the following details:
-4. **Image Name:** nginx
+4. **Image Name:** nginx  
    **Container Name:** nginx_server
 5. Go to the Network section and configure the following port mappings:
 
-(/images/ucp02_t2_networksettings.png)
+![](images/ucp02_t2_networksettings.png)
 
 
 
