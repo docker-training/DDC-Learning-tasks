@@ -224,8 +224,8 @@ It will connect our Docker client to the Swarm manager that is running on our UC
 For the following section, use what you have learnt just now and complete the steps listed below.
    
 1. Now that you’ve deployed your first application, it’s time to try another example. Go to https://github.com/prakhar1989/FoodTrucks
-2. Clone the `FoodTrucks` repo into your **UCP Controller** AWS instance
-3. Deploy the `FoodTrucks` application into UCP
+2. Clone the `FoodTrucks` repo into your local PC or Mac
+3. Deploy the `FoodTrucks` application into UCP. Remember to use the Client Bundle
 4. View the application in your web browser
 
    If you completed all the steps correctly, you should see a very cool application that allows you to search for food trucks in San Francisco
