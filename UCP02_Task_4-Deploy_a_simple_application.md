@@ -86,6 +86,139 @@ In this exercise we will deploy a simple multi container application. The applic
    
    You will notice that when we expand the the view of the `helloredis` application, we also see each service that the application is composed of. 
 
+## Using the Client Bundle
+
+Manually logging into the EC2 instance to run docker-compose to deploy your applications is not very convenient and in a lot of cases not possible. 
+After all, you wouldn’t want to give SSH access to too many people. So instead of SSHing into the machine in order to deploy our applications, 
+we use the client bundle.
+
+The client bundle sets up the certificates needed in order to allow us to use a Docker client or docker-compose on our local machine. 
+It will connect our Docker client to the Swarm manager that is running on our UCP controller node. 
+
+1. Navigate to your user profile in UCP
+
+   ![](images/ucp02_t4_profile_dropdown.PNG)
+2. Click the “Create a Client Bundle” button. This will download a “zip” file with the necessary keys, 
+   certificates and scripts needed to connect your Docker client to Swarm. 
+   
+   ![](images/ucp02_t4_client_bundle.PNG)
+3. Unzip the Client Bundle to a folder of your choice
+4. Take note of the files in your folder now. You should see an `env.sh` file
+
+   Note that in this example we are using a Windows machine and we have unzipped the bundle to `C:\Docker\ucp_client_bundles\ucp-bundle-admin`. 
+   Let's examine the directory using the Windows Terminal (CMD)
+   
+   ```
+      C:\Docker\ucp_client_bundles\ucp-bundle-admin>dir
+	  Volume in drive C is OS
+	  Volume Serial Number is 10D0-EAA3
+
+	  Directory of C:\Docker\ucp_client_bundles\ucp-bundle-admin
+
+	  16/02/2016  01:55 PM    <DIR>          .
+	  16/02/2016  01:55 PM    <DIR>          ..
+	  16/02/2016  01:55 PM             3,648 ca.pem
+	  16/02/2016  01:55 PM             1,679 cert.pem
+	  16/02/2016  01:55 PM               450 cert.pub
+	  16/02/2016  01:55 PM               588 env.cmd
+	  16/02/2016  01:55 PM               627 env.ps1
+	  16/02/2016  01:55 PM               572 env.sh
+	  16/02/2016  01:55 PM             1,679 key.pem
+               7 File(s)          9,243 bytes
+               2 Dir(s)  626,723,794,944 bytes free
+			  
+	```
+   
+   Note the certificates and the `env.sh` and `env.cmd` files. For users on Mac OSX or Linux, you will be using the `env.sh` file. Windows users using
+   `CMD` terminal will be using `env.cmd`
+
+5. Open `env.sh` and take note of the environment variables that the script is setting
+   Let's take a look at `env.sh`
+   ```
+   export DOCKER_TLS_VERIFY=1
+   export DOCKER_CERT_PATH=$(pwd)
+   export DOCKER_HOST=tcp://54.213.232.221:443
+   ```
+   
+   The `DOCKER_TLS_VERIFY` variable turns on TLS verification between our Docker Client and the Docker Engine we want to communicate with.  
+   The `DOCKER_CERT_PATH` variable specifies where our SSL certificates and private key is located. In this case it is in the same folder as our `env.sh` script.  
+   The `DOCKER_HOST` variable specifies the address of the Host we are connecting the client to. In this case, it is our Swarm Manager running on the UCP
+   controller node. 
+   
+   Note that in our example the `DOCKER_HOST` is specified with the public IP address of the node. It would also be possible to specify it with the DNS Name
+6. Open your terminal and change directory into the folder where you extracted the client bundle zip
+7. Run `source ./env.sh` or `env.cmd`
+
+   **For Mac and Linux users**  
+   `$ source ./env.sh`  
+   To verify that it worked, check the value of the variables
+   ```
+   $ echo $DOCKER_HOST
+   tcp://54.213.232.221:443
+   ```
+   
+   **For Windows users using CMD Terminal**  
+   ```
+   C:\Docker\ucp_client_bundles\ucp-bundle-admin>env.cmd
+
+   C:\Docker\ucp_client_bundles\ucp-bundle-admin>echo %DOCKER_HOST%
+   tcp://54.213.232.221:443
+   ```
+   **Note:** Windows users can opt to use a command line tool such as `git bash` and thus be able to follow the same instructions as Mac and Linux users.
+8. Now run `docker info`. You should be able to see all nodes that are connected   
+
+   ```
+   C:\Docker\ucp_client_bundles\ucp-bundle-admin>docker info
+   Containers: 26
+   Images: 61
+   Role: primary
+   Strategy: spread
+   Filters: health, port, dependency, affinity, constraint
+   Nodes: 3
+    ucptest-0: 10.0.7.71:12376
+      Status: Healthy
+      Containers: 9
+      Reserved CPUs: 0 / 1
+      Reserved Memory: 0 B / 3.859 GiB
+      Labels: executiondriver=native-0.2, kernelversion=4.2.0-23-generic, operatingsystem=Ubuntu 14.04.3 LTS, storagedriver=aufs
+      Error: (none)
+      UpdatedAt: 2016-02-16T23:48:03Z
+    ucptest-1: 10.0.31.249:12376
+      Status: Healthy
+      Containers: 9
+      Reserved CPUs: 0 / 1
+      Reserved Memory: 0 B / 3.859 GiB
+      Labels: executiondriver=native-0.2, kernelversion=4.2.0-23-generic, operatingsystem=Ubuntu 14.04.3 LTS, storagedriver=aufs
+      Error: (none)
+      UpdatedAt: 2016-02-16T23:48:05Z
+    ucptest-2: 10.0.37.97:12376
+      Status: Healthy
+      Containers: 8
+      Reserved CPUs: 0 / 1
+      Reserved Memory: 0 B / 3.859 GiB
+      Labels: executiondriver=native-0.2, kernelversion=4.2.0-23-generic, operatingsystem=Ubuntu 14.04.3 LTS, storagedriver=aufs
+      Error: (none)
+      UpdatedAt: 2016-02-16T23:47:35Z
+   Cluster Managers: 1
+    10.0.7.71: Healthy
+      Orca Controller: https://10.0.7.71:443
+      Swarm Manager: tcp://10.0.7.71:2376
+      KV: etcd://10.0.7.71:12379
+   CPUs: 3
+   Total Memory: 11.58 GiB
+   Name: ucp-controller-ucptest-0
+   ID: XNC3:3FYO:DFE3:MLZ5:IUOT:67IV:4RQU:PTJV:S7H7:YL3Y:DQB7:SZGD
+   Labels:
+    com.docker.ucp.license_key=unlicensed
+    com.docker.ucp.license_max_engines=0
+    com.docker.ucp.license_expires=EXPIRED
+
+   C:\Docker\ucp_client_bundles\ucp-bundle-admin>
+   ```
+9. Clone the HelloRedis repository https://github.com/johnny-tu/HelloRedis.git into another folder of your choice
+10. Launch the application by using the Client Bundle. To do this, you just need to go into the applications folder and run `docker-compose up -d`
+
+ 
 ## Deploy another application   
 
 For the following section, use what you have learnt just now and complete the steps listed below.
