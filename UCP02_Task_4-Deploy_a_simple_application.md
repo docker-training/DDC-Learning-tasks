@@ -1,5 +1,8 @@
 # Task 4 - Deploy a simple application on UCP
 
+## Pre-requisites
+- You must have [Docker Toolbox](https://www.docker.com/products/docker-toolbox) installed on your local machine
+
 ## Deploy an application using Docker Compose
 
 In this exercise we will deploy a simple multi container application. The application will be run using **Docker Compose** and contains 2 services (containers)
