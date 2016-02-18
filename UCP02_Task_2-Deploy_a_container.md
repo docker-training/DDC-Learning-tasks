@@ -11,7 +11,7 @@ In this exercise we will deploy an NGINX container
 3. On the Basic settings section fill in the following details:
 4. **Image Name:** nginx  
    **Container Name:** nginx_server
-5. Click on the **Network** link on the left navigation and configure the following port mappings:  
+5. Click on the **Network** section to expand it and configure the following port mappings:  
 
   ![](images/ucp02_t2_networksettings.PNG)
 
