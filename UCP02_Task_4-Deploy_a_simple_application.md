@@ -221,6 +221,30 @@ It will connect our Docker client to the Swarm manager that is running on our UC
 9. Clone the HelloRedis repository https://github.com/johnny-tu/HelloRedis.git into another folder of your choice
 10. Launch the application by using the Client Bundle. To do this, you just need to go into the applications folder and run `docker-compose up -d`
 
+   You may notice the following error
+   ```
+   johnny@JT MINGW64 ~/Documents/GitHub/HelloRedis (master)
+   $ docker-compose up -d
+   helloredis_redis_1 is up-to-date
+   Creating helloredis_javaclient_1
+   unable to find a node that satisfies image==helloredis_javaclient
+   ```  
+   If you look inside the `docker-compose.yml` file, you will notice that the `javaclient` service is defined with a `build` instruction. This is not advised on productions runs, especially when 
+   Docker Compose is interacting with Swarm or UCP. Compose does not have the ability to build an image across every node in the Swarm cluster. It will build on the node the container is scheduled on.
+   
+   Sometimes this can lead to errors if Swarm tries to schedule a container on a node without the image. 
+
+   For best practice, in a production deployment of an application, the compose file should only use images already built and available through Docker Hub or DTR
+
+   Take a look inside the `docker-compose.prod.yml` and compare the difference.
+
+   Now run, `$docker-compose -f docker-compose.prod.yml up -d` to launch the application. 
+
+   The `-f` option allows use to specify a specific compose file to use   
+   
+   
+   
+
  
 ## Deploy another application   
 
