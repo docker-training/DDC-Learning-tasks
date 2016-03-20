@@ -168,6 +168,7 @@ Similar  to **John**. Our user **Kerry** can do all the same actions, despite on
    This is because **Tracey** has the default permission of **No Access*. This means she should not have access to any resources. However, as Tracey is part 
    of the **Engineering** team, she has access to the containers that are available to the team.
   
+  
 
 
    
