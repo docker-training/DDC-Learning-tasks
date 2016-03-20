@@ -133,5 +133,41 @@
    C:\Docker\ucp_client_bundles\ucp-bundle-admin>docker exec -it ub1 bash
    root@340c1b490389:/#
    ```
-      
+   
+## Step 4 - Access to other resources
+
+1. Logout of UCP as the admin user and log back in at "John"
+2. Click on the **Images** link and pull the `hello-world` image 
+3. Click on the **Networks** link and create a Network called `johns-net`
+
+From those steps, we can observe that the user **John Full**, who has the **Full Access** default permission, is able to pull images and create networks. Thus
+John has access to the other UCP resources.
+
+4. Logout of UCP as **John** and log back in as **Kerry**
+5. Click on the **Images** link and pull the `ubuntu:15.04` image 
+6. Click on the **Networks** link and create a Network called `kerry-net`
+
+Similar  to **John**. Our user **Kerry** can do all the same actions, despite only having the **Restricted Access** default permission
+
+7. Logout of UCP as **Kerry** and log back in as **Barry**
+8. Click on the **Images** link and pull the `busybox` image 
+
+   You may notice that the operation hangs. This is because our user **Barry** only has the **View Only** default permission, which prevents operations such
+   as pulling images.
+   
+9. Click on the **Networks** link and create a Network called `barry-net` 
+
+   You will get an **Access Denied** error message because of insufficient permissions.
+   
+10. Logout of UCP as **Barry** and login as **Tracey**
+11. Look at the left navigation bar and notice that there are only three resources available
+   - Applications
+   - Containers
+   - Nodes
+   
+   This is because **Tracey** has the default permission of **No Access*. This means she should not have access to any resources. However, as Tracey is part 
+   of the **Engineering** team, she has access to the containers that are available to the team.
+  
+
+
    
