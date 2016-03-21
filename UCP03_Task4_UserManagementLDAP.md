@@ -25,7 +25,9 @@
 3. Click on the Auth section and change the Method from “Built-in” to “LDAP”
 4. Specify your LDAP server URL 
 5. Disable the **Start TLS** button
-![](images/ucp03_t4_startTLS.PNG)
+
+   ![](images/ucp03_t4_startTLS.PNG)
+   
 6. For the rest of the form, fill in the following details.
 
 | Field                     | Value            |
