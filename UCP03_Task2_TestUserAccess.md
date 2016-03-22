@@ -13,9 +13,9 @@
 
    ![](images/ucp03_t2_labels.PNG)
    
-3. Run an Ubuntu container, and specify ìviewî in the Permissions Label field
-4. Run another Ubuntu container but this time specify the ìrestrictedî label field. Give the container the name `ub1`
-5. Run another Ubuntu container but this time specify the ìrunî label field. Give the container the name `ub2`
+3. Run an Ubuntu container, and specify ‚Äúview‚Äù in the Permissions Label field
+4. Run another Ubuntu container but this time specify the ‚Äúrestricted‚Äù label field. Give the container the name `ub1`
+5. Run another Ubuntu container but this time specify the ‚Äúrun‚Äù label field. Give the container the name `ub2`
 6. What was your observation about each label?
 
    What you should have observed was that when trying to use the "view" label, you get an Access Denied error. When using the "restricted" or
@@ -138,14 +138,14 @@
 
 1. Logout of UCP as the admin user and log back in at "John"
 2. Click on the **Images** link and pull the `hello-world` image 
-3. Click on the **Networks** link and create a Network called `johns-net`
+3. Click on the **Networks** link and create a Network called `johns-net` with the driver `bridged`
 
 From those steps, we can observe that the user **John Full**, who has the **Full Access** default permission, is able to pull images and create networks. Thus
 John has access to the other UCP resources.
 
 4. Logout of UCP as **John** and log back in as **Kerry**
 5. Click on the **Images** link and pull the `ubuntu:15.04` image 
-6. Click on the **Networks** link and create a Network called `kerry-net`
+6. Click on the **Networks** link and create a Network called `kerry-net` with the driver `bridged`
 
 Similar  to **John**. Our user **Kerry** can do all the same actions, despite only having the **Restricted Access** default permission
 
@@ -155,7 +155,7 @@ Similar  to **John**. Our user **Kerry** can do all the same actions, despite on
    You may notice that the operation hangs. This is because our user **Barry** only has the **View Only** default permission, which prevents operations such
    as pulling images.
    
-9. Click on the **Networks** link and create a Network called `barry-net` 
+9. Click on the **Networks** link and create a Network called `barry-net` with the driver `bridged`
 
    You will get an **Access Denied** error message because of insufficient permissions.
    
