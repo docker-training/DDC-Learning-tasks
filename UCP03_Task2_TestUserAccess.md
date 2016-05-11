@@ -125,7 +125,7 @@
    a12ad5f72598        nginx               "nginx -g 'daemon off"   2 hours ago         Up 2 hours          80/tcp, 443/tcp     ucp-node-0/nginx2
    ```
    
-7. Run `docker exec` and open a `bash` terminal to the `ub` container
+7. Run `docker exec` and open a `bash` terminal to the `ub1` container
 
    The operation should succeed because we are now connected to UCP as the Admin user. 
    
@@ -150,10 +150,10 @@ John has access to the other UCP resources.
 Similar  to **John**. Our user **Kerry** can do all the same actions, despite only having the **Restricted Access** default permission
 
 7. Logout of UCP as **Kerry** and log back in as **Barry**
-8. Click on the **Images** link and pull the `busybox` image 
+8. Click on the **Images** link
 
-   You may notice that the operation hangs. This is because our user **Barry** only has the **View Only** default permission, which prevents operations such
-   as pulling images.
+   You may notice that Barry is not given a "pull" function.
+   This is because our user **Barry** only has the **View Only** default permission, which prevents operations such as pulling images.
    
 9. Click on the **Networks** link and create a Network called `barry-net` 
 
