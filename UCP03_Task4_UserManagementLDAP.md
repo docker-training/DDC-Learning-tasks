@@ -6,7 +6,7 @@
 
 ## Step 1 - Examine the LDAP server
 
-1. Open a browser and got to http://<LDAP server URL>/phpldapadmin. This will open up the GUI for your LDAP server
+1. Open a browser and go to http://LDAP_SERVER/phpldapadmin. LDAP_SERVER should be the domain name or public IP address of your LDAP node. This will open up the GUI for your LDAP server
 2. Login to the server with the following credentials:
 
    **Login DN:** cn=admin,dc=test,dc=com
