@@ -20,44 +20,65 @@
    
 ## Step 2 - Integrate UCP and LDAP
 
-1. Login to UCP as the admin user
-2. Go to the “Settings” page of UCP
-3. Click on the Auth section and change the Method from “Built-in” to “LDAP”
-4. Specify your LDAP server URL 
-5. Disable the **Start TLS** button
+1\. Login to UCP as the admin user
 
-   ![](images/ucp03_t4_startTLS.PNG)
-   
-6. For the rest of the form, fill in the following details.
+2\. Go to the “Settings” page of UCP
+
+3\. Click on the Auth section and change the Method from "Managed" to "LDAP"
+
+4\. Specify your LDAP server URL. Use the format "ldap://<domain name to your LDAP node>"
+
+5\. Select "Full Control" on the **Default Permission for Newly Discovered Accounts** field
+
+6\. For the **LDAP Server Configuration** section, fill in the following details.
 
 | Field                     | Value            |
 | :---------                | :-----------     |
-| UCP Admin LDAP Username   | cnorris          |
-| UCP Admin LDAP Password   | password         |
-| Search Account DN         | cn=Chuck Norris,ou=all users,dc=test,dc=com |
-| Search Account Password   | password  |
-| User Base DN              | dc=test,dc=com |
-| User login Attribute Name | uid |
-| User Search Filter        | objectClass=inetOrgPerson |
-| Default Permission        | Full Control |
+| Recovery Admin Username   | admin            |
+| Recovery Admin Password   | orca         |
+| Reader DN                 | cn=Chuck Norris,ou=all users,dc=test,dc=com |
+| Reader Password           | password  |
+   
+7\. For the **LDAP Security Options**, leave both options unchecked.
 
+8\. For the **User Search Configurations** section, fill in the following details.
+
+| Field                     | Value            |
+| :---------                | :-----------     |
+| Base DN                   | dc=test,dc=com   |
+| Username Attribute        | uid |
+| Full Name Attribute       | cn  |
+| Filter                    | objectClass=inetOrgPerson |
+
+8\. Tick the **Scope Subtree** checkbox
+
+   ![](images/ucp03_t4_LDAP_user_search.PNG)
+   
+9\. Scroll down to the **Test LDAP Connection** section and specify the following:
+
+| Field                     | Value            |
+| :---------                | :-----------     |
+| LDAP Test Username        | cnorris          |
+| LDAP Test Password        | password         |
+
+10\. Click the **Test** button and verify that you get a **Success** message
+
+11\. Click **Update Auth Settings**
+   
 ## Step 3 - Test User Access
 
-1. Click on **User and Teams** and check to see that all the users from our LDAP server are present. You will also notice that
-   the previous users you created are now marked as **disabled**
+1. In the **LDAP Sync Status** section, click on the **Sync Now** button.
+2. Click on **User and Teams** and check to see that all the users from our LDAP server are present. You will also notice that
+   the previous users you created are still present.
    
-   ![](images/ucp03_t4_AllUsers.PNG)
-2. Logout of UCP as the admin user. Try and log back in. What do you notice?
+3. Logout of UCP as the admin user. Try and login as user `johnfull`. What do you notice?
 
-   Once UCP is integrated with LDAP, all user accounts will come from LDAP. **Managed** accounts that were previously setup in UCP will be disabled.
+   Once UCP is integrated with LDAP, all user accounts will come from LDAP. **Managed** accounts that were previously setup in UCP will be disabled, accept for the account that your specified in the **Recovery Admin Username** 
+   configuration field. 
    
-3. Login as the user `cnorris`. The password is `password`
-4. Check to see that you have admin access on the account.
+4. Login as the user `cnorris`. The password is `password`
 
-   The admin access is available because, in our LDAP configuration, we specified the `cnorris` account on the **UCP Admin LDAP Username** option.
-   That option is to specify which LDAP user we want to become a UCP admin.
-
-5. Disable the LDAP integration by switch the Authentication back to **Built-in**
+5. Logout as `cnorris` and log back in as `admin`. Disable the LDAP integration by switching the Authentication back to **Managed**
 
 
    
