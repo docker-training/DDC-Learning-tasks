@@ -13,13 +13,13 @@
 
    ![](images/ucp03_t2_labels.PNG)
    
-3. Run an Ubuntu container, and specify ìviewî in the Permissions Label field
-4. Run another Ubuntu container but this time specify the ìrestrictedî label field. Give the container the name `ub1`
-5. Run another Ubuntu container but this time specify the ìrunî label field. Give the container the name `ub2`
+3. Run an Ubuntu container, and specify ‚Äúview‚Äù in the Permissions Label field
+4. Run another Ubuntu container but this time specify the ‚Äúrestricted‚Äù label field. Give the container the name `ub1`
+5. Run another Ubuntu container but this time specify the ‚Äúrun‚Äù label field. Give the container the name `ub2`
 6. What was your observation about each label?
 
    What you should have observed was that when trying to use the "view" label, you get an Access Denied error. When using the "restricted" or
-   "run" label, you are able to launch the container. The reason for this is because, the view label in the "Engineering" team is associated with the 
+   "run" label, you are able to launch the container. The reason for this is because, the view label in the "engineering" team is associated with the 
    "View Only" permission. This permission does not permit you to run containers, whereas the "restricted" and "full control" permissions do.
    
 
@@ -72,13 +72,13 @@
    133dc8bd4065        nginx               "nginx -g 'daemon off"   39 minutes ago      Up 38 minutes       80/tcp, 443/tcp     ucp-node-1/nginx1
    ```
    
-8. Run `docker exec` to open a `bash` terminal on the `ub2` container
+8. Run `docker exec` to open a `bash` terminal on the `ub1` container
 
    The command we need to run is:
    `$ docker exec -it ub1 bash`
    
    This will result in an "Access Denied" error because if you remember, the `ub1` container was run with the `restricted` label, which maps to our "restricted" 
-   permission in the Engineering team. 
+   permission in the engineering team. 
    
    **Note:** The follow example was run on a Windows `CMD` terminal.
    
@@ -166,7 +166,7 @@ Similar  to **John**. Our user **Kerry** can do all the same actions, despite on
    - Nodes
    
    This is because **Tracey** has the default permission of **No Access*. This means she should not have access to any resources. However, as Tracey is part 
-   of the **Engineering** team, she has access to the containers that are available to the team.
+   of the **engineering** team, she has access to the containers that are available to the team.
   
   
 
