@@ -1,37 +1,15 @@
-# Task 6 - Deploy Voting App across multiple nodes
+# Task 6 - Deploy Application across multiple nodes
 
 ## Pre-requisites
+- UCP installed with at least 2 nodes joined
 - Client bundle downloaded
 
-## Step 1 - Setup multi host networking
+## Step 1 - Download the Voting Application
 
-As we saw in the previous exercise, We were not able to start our Demo Voting Application. When `Compose` is run against `Swarm / UCP` and our `Compose` file
-is in the v2 format, `Compose` will by default create an overlay network for our application. Swarm would then schedule the various services in different nodes
-and the services would be able to discover and communicate with each other through this overlay network.
-
-However, an overlay network cannot be created unless our nodes are connected to a discovery service, such as `Consul`, `etcd` or `Zookeeper`. While you can
-use any of those options for the Docker Engine, UCP is installed with `etcd` and thus we will use `etcd` for service discovery. 
-
-The `docker/ucp` image we previously used to install UCP and to join UCP nodes, also comes with a `engine-discovery` command that can be used to 
-configure the service discovery with `etcd`
-
-1. Run `$ docker run --rm -it --name ucp docker/ucp engine-discovery --help` and have a read of the command and its options.
-2. Follow the instructions at [](https://docs.docker.com/ucp/networking/)https://docs.docker.com/ucp/networking/ to setup container networking with UCP
-3. At the completion of step 2, you should be able to create an overlay network from the UCP interface. Go to the **Networks** page in the UCP interface and 
-   create a new overlay network called `test-multi`
-   
-   First, click on the **Networks** link on the left navigation
-   
-   ![](images/IG_ucp02_t6_NetworksLink.PNG)
-   
-   Then click the **Create Network** button.
-   
-   ![](images/IG_ucp02_t6_CreateNetworkButton.PNG)
-   
-   Fill out the form with the following details, then hit **Create**
-   
-   ![](images/IG_ucp02_t6_CreateNetwork.PNG)
-
+1. Go to https://github.com/docker/swarm-microservice-demo-v1 and read the page to get a high level understanding of the application we are going
+   to run.
+2. Clone the application repository into a local folder on your machine.
+3. Remove all existing applications you have deployed on UCP. 
 
 ## Step 2 - Run Docker Compose
 
@@ -41,6 +19,8 @@ configure the service discovery with `etcd`
    ```
    johnny@JT MINGW64 ~/Documents/GitHub/swarm-microservice-demo-v1 (master)
    $ docker-compose up -d
+   ...
+   ...
    Creating swarmmicroservicedemov1_vote-worker_1
    Creating swarmmicroservicedemov1_web-vote-app_1
    unable to find a node that satisfies node==frontend01
@@ -97,7 +77,7 @@ configure the service discovery with `etcd`
    ```
    
    This is because Compose is trying to create an Overlay network on a subnet that is already being used by the host. This is due to the way AWS allocates
-   addresses. If you run into this error, add the following configuration to the end of your `docker-compose.yml` file
+   addresses. If you run into this error, add the following configuration to the end of your `docker-compose.yml` file. 
    
    ```
    networks:
@@ -107,6 +87,17 @@ configure the service discovery with `etcd`
           - subnet: 10.10.10.0/24
    ```
    
+   The error can also be resolved by upgrading the Linux Kernel to version 3.19 or later. 
+   
+4. Check the application is up and running and that the containers are running across different nodes. 
+
+5. Check the **Networks** page and verify that a network called `swarmmicroservicedemov1_default` has been created.
+
+   You should see that the network exists. The name is derived from the name of the project folder. The network should be using the `overlay` driver.
+   This tells us that it is a multi host network.
+   
+   ![](images/IG_ucp02_t6_Networks.PNG)
+   
 ## Step 3 - Use a Production ready configuration
  
 Our `docker-compose.yml` file didn't necessarily follow the best practices. Ideally you shouldn't build your images when deploying your application. The Compose
@@ -114,21 +105,13 @@ file should be running pre-built images from a registry. Remember, developers bu
 
 1. Delete the Voting Application from the **Applications** page in UCP.  
    
-   First, tick the `swarmmicroservicedemov1` application checkbox
-   
-   ![](images/IG_ucp02_t6_SelectApp.PNG)
-
-   Then use the dropdown list above and click *remove*
-   
-   ![](images/IG_ucp02_t6_ActionDropdown.PNG)
-   
 2. Take a look at the Compose file at [](https://github.com/nicolaka/voteapp-base/blob/master/docker-compose.yml)https://github.com/nicolaka/voteapp-base/blob/master/docker-compose.yml
 
    Compare this to the Compose file in the Voting App repo. What do you notice as the difference?
 
 3. Clone the Voteapp Base repository into a folder on your PC / Mac
 
-   `$ git clone https://github.com/nicolaka/voteapp-base
+   `$ git clone https://github.com/nicolaka/voteapp-base`
    
 4. Open the `docker-compose.yml` file in the `voteapp-base` folder and change the port mapping of the `voting-app` service. Map port 80 in the container to port 80 on the host.
 
@@ -156,6 +139,8 @@ file should be running pre-built images from a registry. Remember, developers bu
 6. Launch the application
    
 7. Verify that the application containers are scheduled on different nodes.
+
+8. Check the **Networks** page and verify that an overlay network with the name `voteappbase_voteapp` was created.
    
 ## Step 4 - Test the application
 
@@ -163,9 +148,8 @@ file should be running pre-built images from a registry. Remember, developers bu
 
    ![](images/IG_ucp02_t6_voting_cats_or_dogs.PNG)
 
-   This is the web application where we can cast a vote. From our previous screenshot, we can see that the container is on `ucp-node-1`. 
-   Also, from our configuration, we can know that the container is available through port 80 on the host. Therefore we just need to 
-   input the `ucp-node-1` URL on our web browser to access the application. 
+   This is the web application where we can cast a vote. From our configuration, we know that the container is available through port 80 on the host. Therefore
+   we need to find out what node the container is running on and point our browser to the URL of that node.
    
 2. Cast your vote.
 
@@ -175,5 +159,36 @@ file should be running pre-built images from a registry. Remember, developers bu
    
    ![](images/IG_ucp02_t6_VoteResults.PNG)
    
+## Step 4 - Convert an existing application to run on multiple nodes.
+
+Previously, when we ran the HelloRedis application, you may remember that both containers were scheduled onto the same node. The reason was because
+the Compose file in that application was in the V1 format and that we used container links to get our services tasking with each other. When links 
+are used, Swarm will schedule a container on the same node as the container it is linked to.  
+
+This was the `docker-compose.prod.yml` file we used previously 
+
+```
+javaclient:
+  image: trainingteam/hello-redis:1.0
+  links:
+    - redis:redisdb
+redis:
+  image: redis
+```
+
+If we deleted the "links:" instruction on our `javaclient` service, we could get Swarm / UCP to run the containers on different nodes. However, 
+the containers would be run on the default network and will not be able to communicate with each other using their service names. You would have to use
+the Node IP and exposed ports, which is not ideal.
+   
+The best solution to get our `HelloRedis` example working on multiple nodes is to convert the `docker-compose.prod.yml` file to a `V2` file.
+
+1. Convert the `docker-compose.prod.yml` file to a Version 2 Compose file.
+
+   **Hint**: The `redis` service name will need to be changed to `redisdb` as the `javaclient` code uses this name to connect to the `redis` service
+
+2. Run the HelloRedis application and verify that the containers are deployed on different nodes. 
+
+ 
+
    
    
