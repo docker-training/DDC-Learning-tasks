@@ -1,42 +1,56 @@
 # Task 2: Deploy a container
 
+In this task you will use USP to deploy a web server from the official NGINX image. The following steps will walk you through this process.
+
+1. Deploy a container
+2. Test the deployment
+
 ## Prerequisites
-UCP setup with 3 nodes connected to the UCP controller
+- UCP setup with 3 nodes connected to the UCP controller
 
-## Deploy a container
-In this exercise we will deploy an NGINX container
+## Step 1 - Deploy a container
+In this step you will launch a new container based on the NGINX image using the UCP web UI.
 
-1. Click on **Containers** link on left navigation bar
-2. Click on **Deploy Container** button
-3. On the Basic settings section fill in the following details:
-4. **Image Name:** nginx  
-   **Container Name:** nginx_server
-5. Click on the **Network** section to expand it and configure the following port mappings:  
+1. If you have not already done so, log in to UCP with the built-in **admin** account.
 
-  ![](images/ucp02_t2_networksettings.PNG)
+2. Click the **Containers** link on left navigation bar.
 
-6. Hit the **Run Container** button on the right side panel
-7. You should now see your container listed.   
+3. Click on **+ Deploy Container** button.
 
-  ![](images/ucp02_t2_containers.PNG)
-8. Click on the row where the container is listed to see the full container details. Then scroll down to the **Ports** section of the page to check the port mappings  
+4. Fill out the Basic Settings as shown below:
 
-  ![](images/ucp02_t2_portmappings.PNG)
+  ![](http://i.imgur.com/6upe6pQ.png)
 
-## Quick Test
+5. Expand the **Network** section on the same page and configure the following port mappings:
 
-Access the NGINX server on your web browser. You will need to specify the hostname of the node that the NGINX container is running on.
+  ![](http://i.imgur.com/yazdZZf.png)
 
-1. First, let's take a look at the node our `nginx_server` container is running on. In the container details, you can find the Node information.
+6. Hit the **Run Container** button on the right side panel.
 
-   ![](images/ucp02_t2_container_details_node.PNG)
+  When the operation completes you will see your container listed as shown below. The green circle to the left of the container indicates that the container is in the **running** state.
 
-   In this particular example, our NGINX container is running on the **ucp-node-1** node. The host IP is 10.0.28.145. However in our AWS setup, this 
-   is the private IP address of the node. You won't be able to use this address on your web browser. We will need the public IP or hostname. The AWS instance 
-   details that your instructor has provided to you should contain the hostname. In our case it is **ec2-54-213-151-242.us-west-2.compute.amazonaws.com**. 
+  ![](http://i.imgur.com/7DorWT8.png)
 
-2. Go to your web browser and enter the hostname of the node that the NGINX container is running on.
+7. Click on the row where the container is listed to see the full container details. Then scroll down to the **Ports** section of the page to check the port mappings.
 
-   The result should be the NGINX welcome page.
-   
-   ![](images/ucp02_t2_nginx_welcome.PNG)
+  ![](http://i.imgur.com/vQGDHGE.png)
+
+## Step 2 - Quick Test
+
+In this step you will use your web browser to access the home page of the **nginx_server** container started in the previous step.
+
+In order to access the NGINX container from your web browser you will need the DNS hostname of the node that the container is running on.
+
+1. First, let's take a look at the node our **nginx_server** container is running on. In the container details, you can find the node information.
+
+   ![](http://i.imgur.com/gHMO7O8.png)
+
+   In this particular example, the **nginx_server** container is running on the **node--1** node with an IP of 10.0.18.236. However, this is the private IP address of the node and you will not be able to use this address to connect to the web server. Locate the public IP, or public DNS name, of the node from the lab details you received (each lab machine you have will have a public and priave IP and DNS).
+
+2. Go to your web browser and enter the public IP or public DNS name of the node that the **nginx_server** container is running on.
+
+   You will see the NGINX welcome page.
+
+   ![](http://i.imgur.com/W8wWNH9.png)
+
+You have successfully launched a web container using the Docker UCP web UI.
