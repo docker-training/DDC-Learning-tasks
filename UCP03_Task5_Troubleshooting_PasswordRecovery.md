@@ -1,20 +1,22 @@
-# Task - Troubleshooting - Password Recovery
+# Task 5 - Troubleshooting - Password Recovery
+
+In this task you will see how to recover from a scenario where the password to the built-in UCP admin account has been lost.
+
+If a regular user (not the built-in **admin** account) forgets their password they must contact the UCP admin who can set a new password for them. 
+However, if the password for the built-in **admin** account is lost, there is no built-in email based reset function. We must run a command against a UCP container to reset the password
 
 ## Pre-requisites
-- UCP setup to used **Built-in** authentication (i.e. All users are created inside UCP). The methods detailed in this exercise do not work if UCP is integrated
-  with LDAP for user authentication.
+- UCP configured to use the **Managed** authentication method (**Settings** > **Authentication**).
+
+  > The procedures described in this lab will not work if UCP is configured to use the **LDAP** authentication method.
 
 ## Step 1 - Recovering admin passwords
 
-UCP does not come with a password reset feature. Therefore, if a user forgets their password, they must send a request to the UCP admin to have a new password set.
-This is an easy operation for an admin. 
 
-However, what happens when an admin forgets their password and they are currently not logged in? The password to the default `admin` account can be recovered by 
-deleting the admin user and then restarting the `ucp-controller`
-
-1. If you have not already done so, go to the UCP **Authentication Settings** page and change the method back to **Built-in**.
-2. Logout and log back into the Admin account. 
-3. Change the password of the Admin account to something else.
+1. If you have not already done so, login to UCP as the **admin** user.
+2. Go to **Settings** and click the **AUTH** tab.
+3. Make sure the Authentication Method is set to **Managed**.
+4. Change the password of the Admin account to something else and then logout
 
    Click on **profile** from your user account dropdown list.
    
@@ -23,49 +25,42 @@ deleting the admin user and then restarting the `ucp-controller`
    Fill in the new password of your choice and click **Change Password**
    ![](images/ucp03_t5_ChangePW.PNG)  
 
-4. Pretend that you have forgotten the password to your admin accout.
-5. SSH into the UCP Controller node
-6. Docker `exec` into the `KV` container
-
-   If we do a quick `docker ps` we can see all our UCP containers.
+5. Pretend that you have forgotten the password to your admin accout.
+6. SSH into the UCP Controller node
+7. If we do a quick `docker ps` we can see all our UCP containers.
 
    ```   
-   CONTAINER ID        IMAGE                         COMMAND                  CREATED             STATUS              PORTS                                                                             NAMES
-   212d237e609e        docker/ucp-controller:1.0.1   "/bin/controller serv"   28 hours ago        Up 2 hours          0.0.0.0:443->8080/tcp                                                             ucp-controller
-   f63f1330014d        docker/ucp-cfssl:1.0.1        "/bin/cfssl serve -ad"   28 hours ago        Up 28 hours         8888/tcp, 0.0.0.0:12381->12381/tcp                                                ucp-cluster-root-ca
-   e98447f066d1        docker/ucp-cfssl:1.0.1        "/bin/cfssl serve -ad"   28 hours ago        Up 28 hours         8888/tcp, 0.0.0.0:12382->12382/tcp                                                ucp-client-root-ca
-   55456f6f9ac6        docker/ucp-swarm:1.0.1        "/swarm manage --tlsv"   28 hours ago        Up 28 hours         0.0.0.0:2376->2375/tcp                                                            ucp-swarm-manager
-   edd8a73ac73a        docker/ucp-swarm:1.0.1        "/swarm join --discov"   28 hours ago        Up 28 hours         2375/tcp                                                                          ucp-swarm-join
-   642f9919eadc        docker/ucp-proxy:1.0.1        "/bin/run"               28 hours ago        Up 28 hours         0.0.0.0:12376->2376/tcp                                                           ucp-proxy
-   5f4c12bcc44e        docker/ucp-etcd:1.0.1         "/bin/etcd --data-dir"   28 hours ago        Up 2 hours          2380/tcp, 4001/tcp, 7001/tcp, 0.0.0.0:12380->12380/tcp, 0.0.0.0:12379->2379/tcp   ucp-kv
+   7b7d60c6abe4        docker/ucp-controller:1.1.1   "/bin/controller serv"   5 hours ago         Up 5 hours          0.0.0.0:443->8080/tcp                                                             ucp-controller
+   653b604f74c7        docker/ucp-auth:1.1.1         "/usr/local/bin/enzi "   5 hours ago         Up 5 hours          0.0.0.0:12386->4443/tcp                                                           ucp-auth-worker
+   38135e049bf4        docker/ucp-auth:1.1.1         "/usr/local/bin/enzi "   5 hours ago         Up 5 hours          0.0.0.0:12385->4443/tcp                                                           ucp-auth-api
+   4a0b6f5636ba        docker/ucp-auth-store:1.1.1   "/usr/local/bin/rethi"   5 hours ago         Up 5 hours          0.0.0.0:12383-12384->12383-12384/tcp                                              ucp-auth-store
+   ebb8deb21e23        docker/ucp-cfssl:1.1.1        "/bin/cfssl serve -ad"   5 hours ago         Up 5 hours          8888/tcp, 0.0.0.0:12381->12381/tcp                                                ucp-cluster-root-ca
+   29c85b229c2c        docker/ucp-cfssl:1.1.1        "/bin/cfssl serve -ad"   5 hours ago         Up 5 hours          8888/tcp, 0.0.0.0:12382->12382/tcp                                                ucp-client-root-ca
+   4184c66881b2        docker/ucp-swarm:1.1.1        "/swarm manage --tlsv"   5 hours ago         Up 5 hours          0.0.0.0:2376->2375/tcp                                                            ucp-swarm-manager
+   1921b913b2a8        docker/ucp-swarm:1.1.1        "/swarm join --discov"   5 hours ago         Up 5 hours          2375/tcp                                                                          ucp-swarm-join
+   e6ab82c02bd5        docker/ucp-proxy:1.1.1        "/bin/run"               5 hours ago         Up 5 hours          0.0.0.0:12376->2376/tcp                                                           ucp-proxy
+   67d7c53e6cf1        docker/ucp-etcd:1.1.1         "/bin/etcd --data-dir"   5 hours ago         Up 5 hours          2380/tcp, 4001/tcp, 7001/tcp, 0.0.0.0:12380->12380/tcp, 0.0.0.0:12379->2379/tcp   ucp-kv
    ```
    
-   The container we want to access is `ucp-kv`. This has the KV store that containers user profiles. We will run `docker exec` and start an `ash` process.
-   
-   ```
-   ubuntu@ucp-controller:~$ docker exec -it ucp-kv ash
-   / #
-   ```
-   
-7. Delete the existing Admin account by running `curl -XDELETE -s --cacert /etc/docker/ssl/ca.pem --cert /etc/docker/ssl/cert.pem --key /etc/docker/ssl/key.pem -k https://127.0.0.1:2379/v2/keys/orca/v1/accounts/admin`
+   The container we want to access is `ucp-auth-api`. 
+      
+8. Run the following command. 
 
+   `docker exec -it ucp-auth-api enzi "$(docker inspect --format '{{ index .Args 0 }}' ucp-auth-api)" passwd --interactive`
+   
+9. You will be prompted for the username. Specify **admin**. Then specify the password **orca**
    ```
-   / # curl -XDELETE -s --cacert /etc/docker/ssl/ca.pem --cert /etc/docker/ssl/cert.pem --key /etc/docker/ssl/key.pem -k https://127.0.0.1:2379/v2/keys/orca/v1/accounts/admin    
-   {"action":"delete","node":{"key":"/orca/v1/accounts/admin","modifiedIndex":18636,"createdIndex":18565},"prevNode":{"key":"/orca/v1/accounts/admin",                                                                       "value":"{\"first_name\":\"Orca\",\"last_name\":\"Admin\",\"username\":\"admin\",\"password\":\"$2a$10$i2hMeduf9gWiUIxfH/5zjehsmTy9CWLQW1HEqu1lEPBI                                                                       IlK1hF06a\",\"admin\":true,\"public_keys\":[{\"label\":\"101.173.192.249:55732 Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like                                                                        Gecko) Chrome/49.0.2623.87 Safari/537.36\",\"public_key\":\"-----BEGIN PUBLIC KEY-----\\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA2p+7fHEqLVjaEx                                                                       Wp8uV5\\nFUHbzrbzExKMxf8Xuthx0ZuRhgkLJwdh/ac5WEz/flepkR+6O2ie9dBHWSwXUmzw\\n16y9L/hqRCTMNr4TrU2x7TCQYp/c+eNp0gAYe0G9ZonBUtD7lEPNViKi4I3XJstU\\n/WaL                                                                       Q6tBrkpxBIs8LoEalLMBp0N9UMRJnm75+5Ka65Ei1ou7QWoZZbCEp6lyxfop\\nJa+UTwEa7nru1cnTqE4ET7ZFNMx/ZraUuL/zAmtvw+0fwLGRQ4JC9cadACKF/dYw\\nWk4QKao7BlyKJfIJX                                                                       iPIspvZIfSGdjPoSGTQ7OB5xxK6h1PukTFE41e/d1IRfTVp\\nFQIDAQAB\\n-----END PUBLIC KEY-----\"}],\"role\":0}","modifiedIndex":18565,"createdIndex":18565}}
-   / #
-   ```
-
-8. Restart the UCP Controller container.
-
-   ```
-   ubuntu@ucp-controller:~$ docker restart ucp-controller
-   ucp-controller
+   ubuntu@ucp-controller:~$ docker exec -it ucp-auth-api enzi "$(docker inspect --format '{{ index .Args 0 }}' ucp-auth-api)" passwd --interactive
+   Username: admin
+   Password:
+   Verify Password:
+   INFO[0007] successfully set user account password: admin
    ```
    
-   When you restart the `ucp-controller`, if it does not find an Admin account, it will automatically re-create it and set the default password 
-   of "orca"
-   
-9. Log back into your Admin account using the new password "orca"
+10. Login to the **admin** account on the UCP web UI, making sure that the password is **orca**
+
+
+
    
    
    
