@@ -70,7 +70,7 @@
    
    This time there shouldn't be any errors.
    
-   **Note** Sometimes, you may run into the following type of error
+   > **Note:** Sometimes, you may run into the following type of error. This depends on the setup of your AWS VM and usually occurs on Linux kernel version 3.13 or below
    
    ```
    409 Conflict: subnet sandbox join failed for "70.28.0.0/16": overlay subnet 10.0.0.0/16 has conflicts in the host while running in host mode
@@ -81,10 +81,10 @@
    
    ```
    networks:
-    default:
-      ipam:
-        config:
-          - subnet: 10.10.10.0/24
+     default:
+       ipam:
+         config:
+           - subnet: 10.10.10.0/24
    ```
    
    The error can also be resolved by upgrading the Linux Kernel to version 3.19 or later. 
@@ -162,7 +162,7 @@ file should be running pre-built images from a registry. Remember, developers bu
 ## Step 4 - Convert an existing application to run on multiple nodes.
 
 Previously, when we ran the HelloRedis application, you may remember that both containers were scheduled onto the same node. The reason was because
-the Compose file in that application was in the V1 format and that we used container links to get our services tasking with each other. When links 
+the Compose file in that application was in the V1 format and that we used container links to get our services talking with each other. When links 
 are used, Swarm will schedule a container on the same node as the container it is linked to.  
 
 This was the `docker-compose.prod.yml` file we used previously 
