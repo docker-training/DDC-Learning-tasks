@@ -326,11 +326,11 @@ This step is broken up into the following two sub-steps:
 
   ```
   javaclient:
-  image: trainingteam/hello-redis:1.0
-  links:
-    - redis:redisdb
+    image: trainingteam/hello-redis:1.0
+    links:
+      - redis:redisdb
   redis:
-  image: redis
+    image: redis
   ```
 
   Notice that there are no `build` instructions in this file. All images referenced are pre-built images that are on Docker Hub - `trainingteam/hello-redis:1.0` and `redis`.
