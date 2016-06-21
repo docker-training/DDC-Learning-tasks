@@ -1,40 +1,60 @@
 # Task 4 - Deploy a simple application on UCP
 
+> **Difficulty**: Beginner
+
+> **Time**: Approximately 15 minutes
+
+This task will walk you through the steps of deploying simple applications to Docker UCP. You will complete the following steps in this task.
+
+- Use **Docker Compose** to deploy a web app
+- Use the **Client Bundle** to deploy the app
+- Deploy and connect to a web app
+
 ## Pre-requisites
+
 - You must have [Docker Toolbox](https://www.docker.com/products/docker-toolbox) installed on your local machine
 
-## Deploy an application using Docker Compose
+## Step 1 - Deploy an application using Docker Compose
 
-In this exercise we will deploy a simple multi container application. The application will be run using **Docker Compose** and contains 2 services (containers)
-- A Redis Container
-- A Java client that pings the container to get a response
+In this step you will use **Docker Compose** to deploy a simple multi-container application. The application contains the following 2 services (containers).
 
+  - Redis
+  - A Java client that pings the container to get a response
 
-1. SSH into your UCP controller AWS machine
-2. Use Git to clone the application repository from https://github.com/johnny-tu/HelloRedis.git 
+1. SSH into your UCP controller as the built-in **ubuntu** user.
+
+  Your UCP controller is probably `node-0` in your lab.
+
+2. Use `git` to clone the application repository from https://github.com/johnny-tu/HelloRedis.git
 
    ```bash
-   ubuntu@ucp-controller:~$ git clone https://github.com/johnny-tu/HelloRedis.git
+   $ git clone https://github.com/johnny-tu/HelloRedis.git
    Cloning into 'HelloRedis'...
    remote: Counting objects: 45, done.
    remote: Total 45 (delta 0), reused 0 (delta 0), pack-reused 45
    Unpacking objects: 100% (45/45), done.
    Checking connectivity... done.
-
    ```
-3. You should now see a folder called `HelloRedis`. Change directory into this folder
-4. List the files in the directory. You should see a `docker-compose.yml` file
+
+   This will clone the repo into a new directory called `HelloRedis` within your home directory - `/home/ubuntu/HelloRedis`.
+
+3. Change directory into `HelloRedis`
+
+  ```bash
+  $ cd HelloRedis
+  ```
+
+4. List the files in the directory.
 
    ```bash
-   ubuntu@ucp-controller:~/HelloRedis$ ls
+   $ ls
    docker-compose.prod.yml  docker-compose.yml  Dockerfile  lib  README.md  src
-
    ```
-   
-5. Run `docker-compose up -d`
+
+5. Use **Docker Compose** to bring up the application defined in the `docker-compose.yml` file. You must run the command from the `HelloRedis` directory.
 
    ```bash
-   ubuntu@ucp-controller:~/HelloRedis$ docker-compose up -d
+   $ docker-compose up -d
    Pulling redis (redis:latest)...
    latest: Pulling from library/redis
    ...
@@ -67,53 +87,66 @@ In this exercise we will deploy a simple multi container application. The applic
    Creating helloredis_javaclient_1
 
    ```
-   
-6. Now run `docker-compose ps`. What can you observe?
+
+  This brings up the application defined in `docker-compose.yml`.
+
+6. Run `docker-compose ps` to verify that the application started correctly and is still running.
 
    ```bash
-   ubuntu@ucp-controller:~/HelloRedis$ docker-compose ps
+   $ docker-compose ps
             Name                        Command               State    Ports
    ---------------------------------------------------------------------------
    helloredis_javaclient_1   java HelloRedis                  Up
    helloredis_redis_1        docker-entrypoint.sh redis ...   Up      6379/tcp
    ```
 
-7. Switch over to UCP on your web browser
-8. Click on the “Applications” link on the left navigation bar
-9. You should see the following output
+  The output above shows that the Java client service and the Redis database service are both up and running.
 
-   ![](images/ucp02_t4_applications.PNG)
+7. Open the UCP Web UI with your web browser.
 
-10. Click on the “Show Containers” link on the right side to expand the view of the application
+8. Click the **Applications** link on the left navigation bar.
 
-   ![](images/ucp02_t4_applications_expanded.PNG)
-   
-   You will notice that when we expand the the view of the `helloredis` application, we also see each service that the application is composed of. 
+9. You will see the following output
 
-## Using the Client Bundle
+   ![](http://i.imgur.com/e3JjZLY.png)  
 
-Manually logging into the EC2 instance to run docker-compose to deploy your applications is not very convenient and in a lot of cases not possible. 
-After all, you wouldn’t want to give SSH access to too many people. So instead of SSHing into the machine in order to deploy our applications, 
-we use the client bundle.
+10. Click the **Show Containers** link on the right side to view the Redis and Java client containers that make up the application.
 
-The client bundle sets up the certificates needed in order to allow us to use a Docker client or docker-compose on our local machine. 
-It will connect our Docker client to the Swarm manager that is running on our UCP controller node. 
+   ![](http://i.imgur.com/wmOfC22.png)
 
-1. Navigate to your user profile in UCP
+
+## Step 2 - Using the Client Bundle
+
+Manually logging into (SSH) the UCP node to run `docker-compose` to deploy your applications is not always convenient, and in a lot of cases is not possible. This is where the **client bundle** helps out.
+
+The **client bundle** sets up your local machine with the certificates and other settings needed for you to issue `docker` and `docker-compose` commands to UCP.
+
+This step is broken up into the following two sub-steps:
+
+  - Configure your environment to use the Client Bundle
+  - Deploy the app with the Client Bundle
+
+### Step 2.1 - Configure your environment to use the Client Bundle
+
+1. Navigate to your user profile in UCP.
 
    ![](images/ucp02_t4_profile_dropdown.PNG)
-2. Click the “Create a Client Bundle” button. This will download a “zip” file with the necessary keys, 
-   certificates and scripts needed to connect your Docker client to Swarm. 
-   
-   ![](images/ucp02_t4_client_bundle.PNG)
-3. Unzip the Client Bundle to a folder of your choice
-4. Take note of the files in your folder now. You should see an `env.sh` file
 
-   Note that in this example we are using a Windows machine and we have unzipped the bundle to `C:\Docker\ucp_client_bundles\ucp-bundle-admin`. 
-   Let's examine the directory using the Windows Terminal (CMD)
-   
+2. Click the **Create a Client Bundle** button. This will download a **zip** file with the necessary keys, certificates, and scripts needed to connect your Docker client to UCP.
+
+   ![](images/ucp02_t4_client_bundle.PNG)
+
+  Your browser may warn you about the download. Be sure to choose the option to keep the downloaded file.
+
+3. Unzip the **Client Bundle** to a folder of your choice and open a command prompt to that location.
+
+4. List the files in the folder that you have just unzipped the client bundle contents to.
+
+   In this example we are using a Windows machine and we have unzipped the bundle to `C:\Docker\ucp_client_bundles\ucp-bundle-admin`.
+   Let's examine the directory using the Windows command prompt (CMD).
+
    ```
-   C:\Docker\ucp_client_bundles\ucp-bundle-admin>dir
+   C:\Docker\ucp_client_bundles\ucp-bundle-admin> dir
     Volume in drive C is OS
     Volume Serial Number is 10D0-EAA3
 
@@ -131,46 +164,76 @@ It will connect our Docker client to the Swarm manager that is running on our UC
    20/05/2016  04:52 PM             1,679 key.pem
                7 File(s)         13,099 bytes
                3 Dir(s)  595,220,852,736 bytes free
-			  
-   ```
-   
-   Note the certificates and the `env.sh` and `env.cmd` files. For users on Mac OSX or Linux, you will be using the `env.sh` file. Windows users using
-   `CMD` terminal will be using `env.cmd`
 
-5. Open `env.sh` and take note of the environment variables that the script is setting
-   Let's take a look at `env.sh`
+   ```
+
+   As shown above, the directory contains the TLS keys and certificates, as well as a set of files named `env.cmd`, `env.ps1`, and `env.sh`. The `env.*` files are scripts that configure your current shell/environment so that it can send `docker` and `docker-compose` commands to your UCP controller.
+
+   Windows users can use the `env.cmd` or `env.ps1` scripts. OS X and Linux users can use the `env.sh` script.
+
+   > **Note:** Windows users can opt to use a command line tool such as `git bash` and thus be able to follow the same instructions for Mac and Linux users.
+
+5. Inspect the contents of the `env.sh` file and take note of the environment variables it is setting.
+
    ```
    export DOCKER_TLS_VERIFY=1
    export DOCKER_CERT_PATH="$(pwd)"
    export DOCKER_HOST=tcp://ec2-54-187-21-127.us-west-2.compute.amazonaws.com:443
    ```
-   
-   The `DOCKER_TLS_VERIFY` variable turns on TLS verification between our Docker Client and the Docker Engine we want to communicate with.  
-   The `DOCKER_CERT_PATH` variable specifies where our SSL certificates and private key is located. In this case it is in the same folder as our `env.sh` script.  
-   The `DOCKER_HOST` variable specifies the address of the Host we are connecting the client to. In this case, it is our Swarm Manager running on the UCP
-   controller node. 
-   
-   Note that in our example the `DOCKER_HOST` is specified with the public IP address of the node. It would also be possible to specify it with the DNS Name
-6. Open your terminal and change directory into the folder where you extracted the client bundle zip
-7. Run `source ./env.sh` or `env.cmd`
 
-   **For Mac and Linux users**  
-   `$ source ./env.sh`  
-   To verify that it worked, check the value of the variables
-   ```
-   $ echo $DOCKER_HOST
-   tcp://ec2-54-187-21-127.us-west-2.compute.amazonaws.com:443
-   ```
-   
-   **For Windows users using CMD Terminal**  
-   ```
-   C:\Docker\ucp_client_bundles\ucp-bundle-admin>env.cmd
+   The `DOCKER_TLS_VERIFY` variable turns on TLS verification between our Docker Client and the Docker Engine you want to communicate with (UCP controller).
+   The `DOCKER_CERT_PATH` variable specifies where our TLS certificates and private key is located. In this case it is in the same folder as our `env.sh` script.
+   The `DOCKER_HOST` variable specifies the address of the Docker Host you are connecting the client to. In this case your UCP controller node.
 
-   C:\Docker\ucp_client_bundles\ucp-bundle-admin>echo %DOCKER_HOST%
-   tcp://ec2-54-187-21-127.us-west-2.compute.amazonaws.com:443
+6. Execute the script that is appropriate to your Operating System:
+
+  **Windows PowerShell**
+
+  ```
+  > . .\env.ps1
+  ```
+
+  Note the structure of the command above - the two dots. The first dot tells PowerShell to *dot-source* the script so that the environment variables it sets persist after the script finishes executing. The second dot combined with the backslash tell PowerShell to execute the script from the current directory. There is a space between the two dots but not between the second dot and the backslash :-D
+
+  If your system does not allow the execution of PowerShell scripts you may need to use the `Set-ExecutionPolicy Unrestricted` PowerShell cmdlet to enable script execution. You may have to run this from a PowerShell terminal opened with the `Run as Administrator` option. You may still be prompted to allow this script to execute. If you had to change your execution policy, you may wish to change it back to restricted after executing the script (`Set-ExecutionPolicy Restricted`).
+
+  **Windows command prompt**
+
+  ```
+  > env.cmd
+  ```
+
+  **Mac OS X and Linux**
+
+  ```
+  $ source ./env.sh
+  ```
+
+   To verify that that the script worked, check the value of the variables.
+
+  **Windows PowerShell**
+
+  ```
+  > GetChildItem Env:
+  ```
+
+  The Docker related variables will be listed towards the top.
+
+  **Windows command prompt**
+
+  ```
+  > set
+  ```
+
+  The Docker related variables will be listed towards the top.
+
+  **Mac OS X and Linux**
+
    ```
-   **Note:** Windows users can opt to use a command line tool such as `git bash` and thus be able to follow the same instructions as Mac and Linux users.
-8. Now run `docker info`. You should be able to see all nodes that are connected   
+   $ env | grep DOCKER
+   ```
+
+7. Now run `docker info` to verify that your local environment has been configured correctly. You should see the UCP controller and nodes listed as shown below.
 
    ```
    C:\Docker\ucp_client_bundles\ucp-bundle-admin>docker info
@@ -228,44 +291,74 @@ It will connect our Docker client to the Swarm manager that is running on our UC
     com.docker.ucp.license_max_engines=10
     com.docker.ucp.license_expires=2016-05-31 21:53:37 +0000 UTC
    ```
-9. Clone the HelloRedis repository https://github.com/johnny-tu/HelloRedis.git into another folder of your choice
+
+### Step 2.2 - Deploy the app with the Client Bundle
+
+8. Clone the **HelloRedis** repository into another folder of your choice
+
+  ```
+  > git clone https://github.com/johnny-tu/HelloRedis.git
+  ```
+
 9. Remove the existing HelloRedis application from UCP.
 
-   ![](images/ucp02_t4_applications_remove.PNG)
-   
-10. Launch the application by using the Client Bundle. To do this, you just need to go into the applications folder and run `docker-compose up -d`
+   ![](http://i.imgur.com/7oQCz2i.png)
+
+10. Launch the application by using the Client Bundle.
+
+   To do this, change directory into the folder that you cloned the `HelloRedis` repo into and run `docker-compose up -d`
 
    You may notice the following error
+
    ```
-   johnny@JT MINGW64 ~/Documents/GitHub/HelloRedis (master)
-   $ docker-compose up -d
+   > docker-compose up -d
    helloredis_redis_1 is up-to-date
    Creating helloredis_javaclient_1
    unable to find a node that satisfies image==helloredis_javaclient
-   ```  
-   If you look inside the `docker-compose.yml` file, you will notice that the `javaclient` service is defined with a `build` instruction. This is not advised on productions runs, especially when 
-   Docker Compose is interacting with Swarm or UCP. Compose does not have the ability to build an image across every node in the Swarm cluster. It will build on the node the container is scheduled on.
-   
-   Sometimes this can lead to errors if Swarm tries to schedule a container on a node without the image. 
+   ....
+   ```
 
-   For best practice, in a production deployment of an application, the compose file should only use images already built and available through Docker Hub or DTR
+   If you look inside the `docker-compose.yml` file, you will see that the `javaclient` service is defined with a `build` instruction. This is not advised on productions runs, especially when Docker Compose is interacting with Swarm or UCP. This is because Compose does not have the ability to build an image across every node in the cluster - Ii will build on the node the container is scheduled on. This can sometimes lead to errors if Swarm tries to schedule a container on a node without the image.
 
-   Take a look inside the `docker-compose.prod.yml` and compare the difference.
+   Best practice for production deployments is to only use pre-built images that are available through Registries such as Docker Hub and Docker Trusted Registry.
 
-   Now run, `$docker-compose -f docker-compose.prod.yml up -d` to launch the application. 
+11. Inspect the contents of the `docker-compose.prod.yml` with your favorite text editor. Be sure to open the file with **prod** in the name.
 
-   The `-f` option allows users to specify a specific compose file to use   
+  ```
+  javaclient:
+  image: trainingteam/hello-redis:1.0
+  links:
+    - redis:redisdb
+  redis:
+  image: redis
+  ```
 
-11. Take note of the nodes each container is running on. You should see that both containers are on the same node. This is the expected behavior due 
-   to how networking works on older Compose applications. Later in the course we will learn how to deploy application containers across multiple nodes.
+  Notice that there are no `build` instructions in this file. All images referenced are pre-built images that are on Docker Hub - `trainingteam/hello-redis:1.0` and `redis`.
 
-   ![](images/ucp02_t4_helloredis.PNG)
+12. Start the production version of the application with the following command (be sure to use the compose file with **prod** in its name).
+
+  ```
+  > docker-compose -f docker-compose.prod.yml up -d
+  ```
+
+   The `-f` option lets you tell Docker Compose to use a specific file instead of the default `docker-compose.yml`.
+
+13. Switch to the Docker UCP web UI and click the **Applications** link in the left hand bar.
+
+   Notice that both containers in the app are running on the same UCP node.
+
+   ![](http://i.imgur.com/BBibEhc.png)
+
+   This is because the HelloRedis application uses a Compose v1 file as well as container *links*. When you have container links defined,
+   Compose will run all linked containers on the same node. However, links are no longer the recommended method for connecting containers. The preferred method is *container networking*, which is supported in v2 Compose files.
+
+You now know how to deploy Docker Compose applications from your local machine using **Client Bundles**.
  
-## Deploy another application   
+## Step 3 - Deploy another application   
 
 For the following section, use what you have learnt just now and complete the steps listed below.
    
-1. Now that you’ve deployed your first application, it’s time to try another example. Go to https://github.com/prakhar1989/FoodTrucks
+1. Now that youâ€™ve deployed your first application, itâ€™s time to try another example. Go to https://github.com/prakhar1989/FoodTrucks
 2. Clone the `FoodTrucks` repo into your local PC or Mac
 3. Deploy the `FoodTrucks` application into UCP. Remember to use the Client Bundle
 4. View the application in your web browser
