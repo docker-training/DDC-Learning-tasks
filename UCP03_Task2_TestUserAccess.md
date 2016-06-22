@@ -93,7 +93,7 @@ In this step you will create and download a **client bundle** for the **johnfull
    ca.pem  cert.pem  cert.pub  env.cmd  env.ps1  env.sh  key.pem
    ```
 
-5. Execute the `source.sh` shell script.
+5. Execute the `env.sh` shell script.
 
   ```
   nigel@surfacewah MINGW64 ~/Downloads/ucp-bundle-johnfull
