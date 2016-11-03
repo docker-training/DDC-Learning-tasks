@@ -99,7 +99,54 @@ In this task you will complete the following steps:
    ![](/images/DEOPS-DTR-T2_repo_permissions.PNG)
    
 
-  
+## Step 5 - Push image 
+
+1. Go back to your local terminal and push the **sample-app** repo. (Make sure you are logged into Chloe's account)
+
+   ```
+   johnny@LAPTOP-CT7E41JV MINGW64 ~
+   $ docker push ec2-54-213-179-82.us-west-2.compute.amazonaws.com/engineering/sample-app:1.0
+   The push refers to a repository [ec2-54-213-179-82.us-west-2.compute.amazonaws.com/engineering/sample-app]
+   a02596fdd012: Pushed
+   1.0: digest: sha256:a18ed77532f6d6781500db650194e0f9396ba5f05f8b50d4046b294ae5f83aa4 size: 524
+   ```
+   
+2. Open the repository on the DTR web UI and go to the **tags** tab. Verify that you can see a 1.0 tag.
+
+   ![](/images/DEOPS-DTR-T2_tags.PNG)
+   
+
+## Step 6 - Pull image 
+
+For exercise purposes here, we will use one of our AWS nodes and pretend that it is a local machine. **Do not use the UCP client bundle for this part**
+
+1. SSH into the node designated as `ucp-controller`. Login to DTR on the Docker CLI as **barryview**
+
+   `$ docker login <DTR url>`
+
+2. Pull the 1.0 image from the **sample-app** repo.
+
+   `$ docker pull ec2-54-213-179-82.us-west-2.compute.amazonaws.com/engineering/sample-app:1.0`
+
+   The pull operation succeeds because the repo is public. Anyone can pull from a public repository
+   
+3. Re-tag the image as version 1.1
+
+   `$ docker tag ec2-54-213-179-82.us-west-2.compute.amazonaws.com/engineering/sample-app:1.0 ec2-54-213-179-82.us-west-2.compute.amazonaws.com/engineering/sample-app:1.1`
+
+4. Push the new image tag into the repo
+
+   ```
+   ubuntu@ucp-controller:~$ docker push ec2-54-213-179-82.us-west-2.compute.amazonaws.com/engineering/sample-app:1.1
+   The push refers to a repository [ec2-54-213-179-82.us-west-2.compute.amazonaws.com/engineering/sample-app]
+   a02596fdd012: Layer already exists
+   unauthorized: authentication required
+   ubuntu@ucp-controller:~$
+   ```
+   
+   Notice the error message. This is because the user **barryview** does not have write acccess to the repository. Barry is part of the **engineering** organization but is in the **web** team. In order to have write access to the repository, a user must be part of a team in that organization and that team must be given write access to the repository. If you recall from earlier on, the **web** team was only given Read only access to the repository.
+   
+   
 
 
    
