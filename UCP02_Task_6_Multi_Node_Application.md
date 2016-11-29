@@ -1,33 +1,17 @@
 # Task 6 - Deploy Application across multiple nodes
 
 ## Pre-requisites
-- UCP installed with at least 2 nodes joined
-- Client bundle downloaded
+- UCP installed with at least 2 worker nodes
+- Client bundle downloaded 
 
-## Step 1 - Download the Voting Application
+## Step 1 - Download and examine the Voting Application
 
 1. Go to https://github.com/docker/swarm-microservice-demo-v1 and read the page to get a high level understanding of the application we are going
    to run.
 2. Clone the application repository into a local folder on your machine.
-3. Remove all existing applications you have deployed on UCP. 
+3. Remove all existing applications and services you have deployed on UCP.  
 
-## Step 2 - Run Docker Compose
-
-1. Change directory to the Voting Application folder
-2. Launch the application with Docker Compose. What can you observe?
-
-   ```
-   johnny@JT MINGW64 ~/Documents/GitHub/swarm-microservice-demo-v1 (master)
-   $ docker-compose up -d
-   ...
-   ...
-   Creating swarmmicroservicedemov1_vote-worker_1
-   Creating swarmmicroservicedemov1_web-vote-app_1
-   unable to find a node that satisfies node==frontend01
-   ```
-3. Try and identify the cause of the error and edit the `docker-compose.yml` file to fix it.
-
-   Let's take a quick look at the `docker-compose.yml` file
+4. Let's take a quick look at the `docker-compose.yml` file
    
    ```
    version: '2'
@@ -57,68 +41,26 @@
          - POSTGRES_USER=postgres
          - POSTGRES_PASSWORD=pg8675309
    ```
-   
-   Notice the line saying `constraint:node: "=frontend01"`. 
-   This tells Docker that the service container must be run on a Node called `frontend01`. We don't have such a Node and hence the error message.
-   
-   This Compose file was written with a development machine in mind as opposed to a production deployment. Hence why each service has a `build` instruction instead
-   of an `image` instruction. 
-   
-   Delete the `constraint:node` line and save the file.
-   
-3. Once the error has been fixed, launch the application again.
-   
-   This time there shouldn't be any errors.
-   
-   > **Note:** Sometimes, you may run into the following type of error. This depends on the setup of your AWS VM and usually occurs on Linux kernel version 3.13 or below
-   
-   ```
-   409 Conflict: subnet sandbox join failed for "70.28.0.0/16": overlay subnet 10.0.0.0/16 has conflicts in the host while running in host mode
-   ```
-   
-   This is because Compose is trying to create an Overlay network on a subnet that is already being used by the host. This is due to the way AWS allocates
-   addresses. If you run into this error, add the following configuration to the end of your `docker-compose.yml` file. 
-   
-   ```
-   networks:
-     default:
-       ipam:
-         config:
-           - subnet: 10.10.10.0/24
-   ```
-   
-   The error can also be resolved by upgrading the Linux Kernel to version 3.19 or later. 
-   
-4. Check the application is up and running and that the containers are running across different nodes. 
 
-5. Check the **Networks** page and verify that a network called `swarmmicroservicedemov1_default` has been created.
-
-   You should see that the network exists. The name is derived from the name of the project folder. The network should be using the `overlay` driver.
-   This tells us that it is a multi host network.
-   
-   ![](images/IG_ucp02_t6_Networks.PNG)
-   
-## Step 3 - Use a Production ready configuration
+## Step 2 - Use a Production ready configuration
  
 Our `docker-compose.yml` file didn't necessarily follow the best practices. Ideally you shouldn't build your images when deploying your application. The Compose
 file should be running pre-built images from a registry. Remember, developers build the images and push them to the registry, while IT operations runs the images.
-
-1. Delete the Voting Application from the **Applications** page in UCP.  
    
-2. Take a look at the Compose file at [](https://github.com/nicolaka/voteapp-base/blob/master/docker-compose.yml)https://github.com/nicolaka/voteapp-base/blob/master/docker-compose.yml
+2. Take a look at the Compose file at [](https://github.com/docker-training/voteapp-base/blob/master/docker-compose.yml)https://github.com/docker-training/voteapp-base/blob/master/docker-compose.yml
 
    Compare this to the Compose file in the Voting App repo. What do you notice as the difference?
 
 3. Clone the Voteapp Base repository into a folder on your PC / Mac
 
-   `$ git clone https://github.com/nicolaka/voteapp-base`
+   `$ git clone https://github.com/docker-training/voteapp-base`
    
 4. Open the `docker-compose.yml` file in the `voteapp-base` folder and change the port mapping of the `voting-app` service. Map port 80 in the container to port 80 on the host.
 
    To do this, look for the section:
    ```
    voting-app:
-     image: docker/example-voting-app-voting-app
+     image: trainingteam/voting-app:latest
      ports:
        - "80"
    ```
@@ -126,9 +68,9 @@ file should be running pre-built images from a registry. Remember, developers bu
    Change it to 
    ```
    voting-app:
-     image: docker/example-voting-app-voting-app
+     image: trainingteam/voting-app:latest
      ports:
-       - "80:80"
+       - "8080:80"
    ```
    
    The reason for this is so that as IT operations, we control which ports services are exposed on as opposed to having the port automatically mapped. Also, if 
@@ -136,13 +78,15 @@ file should be running pre-built images from a registry. Remember, developers bu
    
 5. Repeat the same procedure, for the `result-app` service. Map port 80 to port 5000
    
-6. Launch the application
+6. Launch the application.
+   
+   **Note:** Make sure your Docker client is using the client bundle. 
    
 7. Verify that the application containers are scheduled on different nodes.
 
 8. Check the **Networks** page and verify that an overlay network with the name `voteappbase_voteapp` was created.
    
-## Step 4 - Test the application
+## Step 3 - Test the application
 
 1. Open the `voteappbase_voting-app_1` on your web browser. You should see the following:
 
@@ -159,36 +103,46 @@ file should be running pre-built images from a registry. Remember, developers bu
    
    ![](images/IG_ucp02_t6_VoteResults.PNG)
    
-## Step 4 - Convert an existing application to run on multiple nodes.
 
-Previously, when we ran the HelloRedis application, you may remember that both containers were scheduled onto the same node. The reason was because
-the Compose file in that application was in the V1 format and that we used container links to get our services talking with each other. When links 
-are used, Swarm will schedule a container on the same node as the container it is linked to.  
+## Step 4 - Scale the voting-app
 
-This was the `docker-compose.prod.yml` file we used previously 
+Just we like we did when we deployed the Voting App using Services, let's scale our voting-app container because we just having the one container is no longer sufficient to handle our traffic. 
 
-```
-javaclient:
-  image: trainingteam/hello-redis:1.0
-  links:
-    - redis:redisdb
-redis:
-  image: redis
-```
+Scaling legacy applications needs to be done via the `docker-compose scale` command.
 
-If we deleted the "links:" instruction on our `javaclient` service, we could get Swarm / UCP to run the containers on different nodes. However, 
-the containers would be run on the default network and will not be able to communicate with each other using their service names. You would have to use
-the Node IP and exposed ports, which is not ideal.
+1. Scale the voting-app service in our application
+
+   From your `voteapp-base` folder in your terminal, run `$ docker-compose scale voting-app=3`
    
-The best solution to get our `HelloRedis` example working on multiple nodes is to convert the `docker-compose.prod.yml` file to a `V2` file.
+   ```
+   ubuntu@ucp-controller:~/voteapp-base$ docker-compose scale voting-app=3
+   WARNING: The "voting-app" service specifies a port on the host. If multiple containers for this service are created on a single host, the port will clash.
+   Creating and starting voteappbase_voting-app_2 ... error
+   Creating and starting voteappbase_voting-app_3 ... done
 
-1. Convert the `docker-compose.prod.yml` file to a Version 2 Compose file.
+   ERROR: for voteappbase_voting-app_2  Cannot start service voting-app: Error response from daemon: container bfda58504aec0f6a264f5ab5fe56bb30f4641da4053c4117a4daf608051cab53: endpoint join on GW Network failed: driver failed programming external connectivity on endpoint gateway_bfda58504aec (adb03b6d067f70b8af4276df319498032c4f95afdf2bb3d2c6e81792d5ebe6b3): Bind for 0.0.0.0:8080 failed: port is already allocated
+   ```
+   
+   You will get the above error message because we require the `voting-app` container to be mapped to port 8080 on a node. We only have 2 worker nodes available in our cluster and one of them is already running the voting-app 
+   container. There are insufficient nodes with port 8080 available to scale up to 3 containers. 
+   
+2. Check the containers that are running for the application
+    
+   You should see something similar to:
+   
+   ![](images/DEOPS-legacy_voting_app.PNG)
+   
+   We have two containers running for the voting app, one on each node.
+   
+3. Open a browser tab for each voting app container (one tab will have the url for `ucp-node-0` and the other for `ucp-node-1`. Both tabs will use port 8080)
 
-   **Hint**: The `redis` service name will need to be changed to `redisdb` as the `javaclient` code uses this name to connect to the `redis` service
+4. Cast your votes on both tabs and check the results page. The results page should display **2 votes** on the bottom right corner.    
+   
 
-2. Run the HelloRedis application and verify that the containers are deployed on different nodes. 
+## Additional note
 
- 
-
+Notice how when we deploy a legacy application using `docker-compose` we do not get the benefits of Docker services and the ingress load balancing. This time on out voting app, 
+we did not see our requests being handled by a different container each time. We had to manually enter in URL of each node that the voting-app container was running on. This problem can be 
+resolved by putting a load balancer application, such as `HAProxy` or `NGINX` in front of our voting container.  
    
    
