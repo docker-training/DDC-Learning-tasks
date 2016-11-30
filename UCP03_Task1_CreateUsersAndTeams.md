@@ -23,21 +23,21 @@ In this step you will create the 4 new users shown below.
 | barryview  | Barry View        | View Only           |
 | traceyno   | Tracey No         | No Access           |
 
-1. Click **Users & Teams** from the left navigation pane.
+1. Click **User Management** from the top navigation bar.
 
-   ![](http://i.imgur.com/LYX8Onu.png)
+   ![](images/DEOPS-ucp_user_management.PNG)
 
 2. Click **Create User**.
 
-   ![](http://i.imgur.com/E4mKCgj.png)
+   ![](images/UCP-create_user.PNG)
 
 3. Fill out the **Create User** form with the details provided in the table above. The screenshot below shows the form filled out with the details for the *John Full* user.
 
-   ![](http://i.imgur.com/iCvJjXU.png)
-
-> Be sure to make a note of the password that you set for each user. You will need this in future labs.
+   <img src="images/UCP-create_user_form.PNG"/>
 
 4. Click **Create User**.
+
+> Be sure to make a note of the password that you set for each user. You will need this in future labs.
 
 Repeat steps 1-4 for all users in the table above. Be sure to select the appropriate permissions from the **Default Permissions** dropdown.
 
@@ -49,17 +49,15 @@ Users can be grouped into teams for simpler management.
 
 This step will walk you through the process of creating a team and adding users to the team.
 
-1. Create a team called **Engineering** by clicking the ** + Create** button shown in the image below.
+1. Create a team called **engineering** by clicking the ** + Create** button shown in the image below.
 
-  ![](http://i.imgur.com/LMsxBMa.png)
+  <img src="images/UCP-create_team.PNG" width="75%"/>
 
-2. Set the **TEAM NAME** to "Engineering" and make sure **TYPE** is "Managed".
+2. Set the **TEAM NAME** to "engineering"
 
-> **Managed** teams have their accounts and passwords managed by UCP rather than an external LDAP service.
+3. Make sure the engineering team is selected and click the **Add User to Team** button from the **Members** tab.
 
-3. Make sure the Engineering team is selected and click the **Add User to Team** button form the **Members** tab.
-
-  ![](http://i.imgur.com/9KQw0o0.png)
+  ![](images/UCP-add_users_to_team.PNG)
 
 4. Add all four new users to the team by clicking the **Add to Team** button next to each of them and then click **Done**. Do not add yourself (usually "admin") to the team.
 
@@ -73,7 +71,7 @@ In this step you will create a new label and assign the Engineering team "View O
 
 1. With the **Engineering** team selected, go to the **Permissions** tab and click **+ Add Label**.
 
-  ![](http://i.imgur.com/yQ1mrRV.png)
+  ![](images/UCP-add_label_to_team.PNG)
 
 2. Create the following three labels and click **Add Label**.
 
@@ -85,22 +83,26 @@ In this step you will create a new label and assign the Engineering team "View O
 
 The labels will now be listed on the **Permissions** tab of the Engineering team.
 
-## Step 4 - Deploy containers
+## Step 4 - Deploy Services
 
-In this step you will start a new container with the "view" label. You will also start one or more container without any label.
+In this step you will deploy a new Service using the NGINX image and use the "view" label. You will also deploy a service without any label.
 
-1. Select **Containers** from the left hand pane, and click **+ Deploy Container**.
+1. Select **Resources** from the top navigation bar, and click **Create Service**.
 
-  ![](http://i.imgur.com/STas02x.png)
+2. Create a service using the following details:
 
-1. Fill out the Deploy form with the following details and then click **Run Container**.
+   * **Service Name:** nginx
+   * **Images:** nginx
+   
+   Scroll to the botton of the form, where you can see the **Permissions Label** field. Select the **View** label
+   
+   ![](images/UCP-create_service_with_label.PNG)
+   
 
-  ![](http://i.imgur.com/UGV5lvO.png)
 
+Repeat the above steps to deploy another Service but this time, **Do note use any label**. Be sure to give each service a unique name.
 
-Repeat the above steps to deploy one or more containers without any label. Be sure to give each container a unique name.
-
-In the next exercise you will explore the implications of running containers with labels.
+In the next exercise you will explore the implications of running Services with labels.
    
    
    
