@@ -58,27 +58,30 @@ In this step you will deploy a Dockerized web app and apply the "production" lab
 
   If you need details on how to do this, refer back to Step 3 in Task 2.
 
-4. Clone the https://github.com/johnny-tu/HelloRedis repository from withint the directory that contains Chloe's unzipped client bundle.
+4. Clone the https://github.com/docker-training/HelloRedis repository from withint the directory that contains Chloe's unzipped client bundle.
 
   ```
-  git clone https://github.com/johnny-tu/HelloRedis
+  git clone https://github.com/docker-training/HelloRedis
   ```
 
 5. Add the **production** lable to both services in the `docker-compose.prod.yml` file.
 
    When completed, your `docker-compose.prod.yml` file should look like the following:
-
+   
+   
    ```
-javaclient:
+version: '2'
+
+services:
+  javaclient:
     image: trainingteam/hello-redis:1.0
-    links:
-    - redis:redisdb
     labels:
       com.docker.ucp.access.label: "production"
-redis:
+  redis:
     image: redis
     labels:
       com.docker.ucp.access.label: "production"
+	  
    ```
 
 6. Launch the application with the following command:
@@ -91,7 +94,7 @@ redis:
 
   If you experience issues with this step, ensure that you have correctly set the environment variables using the script file supplied as part of Chloe's client bundle.
 
-7. Click on the **Applications** link in the UCP Dashboard to see the **helloredis** application. Check both containers to make sure they have the "production" label.
+7. Click on the **Applications** in the **Resources** section to see the **helloredis** application. Check both containers to make sure they have the "production" label.
 
 8. Click the **helloredis** application and drill into each container to make sure it has the **com.docker.ucp.access.label: "production"** label.
 
@@ -102,7 +105,7 @@ redis:
 
 1. Login to UCP as **johnfull** from the **Engineering** team.
 
-2. Click on the **Applications** link in the left pane and verify that you can see the application.
+2. Click on the **Applications** link under the **Resources** page and verify that you can see the application.
 
 3. Drill into one of the containers and try and open a bash terminal from the **Console** tab.
 
