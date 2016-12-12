@@ -104,4 +104,40 @@ In this step, we will pull the image we have just uploaded to DTR, using a diffe
    access in order to be able to push. This is done via the use of Organizations and Teams.
    
    
+## Step 5 - Test the UCP and DTR integration
+
+1. On our browser, login to DTR as the user **johnfull** and click on the **New Repository** button to create a repository called `hello-world`. The repository should go under your **johnfull** account
+   
+2. Open a new SSH terminal to your `ucp-controller` VM
+
+3. Pull the `hello-world` image and then retag it with your DTR repository URL
+
+	```
+	ubuntu@ucp-controller:~$ docker pull hello-world
+	Using default tag: latest
+	latest: Pulling from library/hello-world
+	c04b14da8d14: Pull complete
+	Digest: sha256:0256e8a36e2070f7bf2d0b0763dbabdd67798512411de4cdcf9431a1feb60fd9
+	Status: Downloaded newer image for hello-world:latest
+
+	ubuntu@ucp-controller:~$ docker tag hello-world  ec2-54-244-191-106.us-west-2.compute.amazonaws.com/johnfull/hello-world:1.0
+	```
+
+4. Push the image
+   
+    ```
+    ubuntu@ucp-controller:~$ docker push ec2-54-244-191-106.us-west-2.compute.amazonaws.com/johnfull/hello-world:1.0
+	The push refers to a repository [ec2-54-244-191-106.us-west-2.compute.amazonaws.com/johnfull/hello-world]
+	a02596fdd012: Pushed
+	1.0: digest: sha256:a18ed77532f6d6781500db650194e0f9396ba5f05f8b50d4046b294ae5f83aa4 size: 524
+	```
+
+5. Open the UCP web UI and navigate to the **Resources --> Images** page.
+
+6. Use the **Add Image** button dropdown and click on **Pull Image**
+
+7. Pull the image you pushed in step 4. 
+
+   If you sucessfully integrated UCP and DTR in the previous exercise you should received no errors here. 
+
    

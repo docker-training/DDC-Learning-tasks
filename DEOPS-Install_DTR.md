@@ -217,6 +217,21 @@ Then you configure your operating system to trust that certificate.
 
    Every Docker Engine in the Swarm cluster must be configured to trust DTR
    
+
+## Step 5 - Test the integration
+
+1. Open your browser to DTR and click on the **New Repository** button to create a repository called `hello-world`. The repository should go under your **admin** account
+
+   ![](images/DTR-private-repo.PNG)
+   
+2. Open a new SSH terminal to your `ucp-controller` VM
+
+   
+   
+   
+   
+
+   
    
 
    
